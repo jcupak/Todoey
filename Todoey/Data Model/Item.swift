@@ -8,7 +8,11 @@
 
 import Foundation
 
-class Item {
+// Identify class as able to be encoded/decoded as plist
+// Replace Encodable, Decodable with Codable
+// NOTE: All properties must be standard types
+class Item: Codable {
+    
     var title: String = ""
-    var done: Bool = false
+    var done:  Bool   = false
 }
