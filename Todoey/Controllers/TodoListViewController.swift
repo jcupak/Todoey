@@ -9,11 +9,12 @@
 import UIKit
 import RealmSwift
 
-class TodoListViewController: UITableViewController {
+class TodoListViewController: SwipeTableViewController {
 
-    var todoItems: Results<Item>?
     let realm = try! Realm()
     
+    var todoItems: Results<Item>?
+
     var selectedCategory : Category? {
         didSet {
              loadItems()
@@ -21,6 +22,7 @@ class TodoListViewController: UITableViewController {
     }
     
     override func viewDidLoad() {
+        
         super.viewDidLoad()
         
     }
@@ -33,7 +35,7 @@ class TodoListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
         if let item = todoItems?[indexPath.row]  {
             
@@ -43,7 +45,7 @@ class TodoListViewController: UITableViewController {
 
         } else {
             
-            cell.textLabel?.text = "No Items Added"
+            cell.textLabel?.text = "No items added"
         }
 
         return cell
@@ -76,9 +78,9 @@ class TodoListViewController: UITableViewController {
         
         var textField = UITextField()
         
-        let alert = UIAlertController(title: "Add New Todo Item", message: "", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Add New Item", message: "", preferredStyle: .alert)
         
-        let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
+        let action = UIAlertAction(title: "Add", style: .default) { (action) in
             
             if let currentCategory = self.selectedCategory {
                 do {
@@ -106,7 +108,22 @@ class TodoListViewController: UITableViewController {
         present(alert, animated: true, completion: nil)
     }
     
-    //MARK: - Model Manipulation Methods
+    //MARK: - Delete Data From Swipe
+    
+    override func updateModel(at indexPath: IndexPath) {
+        
+        if let item = todoItems?[indexPath.row] {
+            do {
+                try realm.write {
+                    realm.delete(item)
+                }
+            } catch {
+                print("Error deleting item, \(error)")
+            }
+        }
+    }
+    
+   //MARK: - Model Manipulation Methods
     
     func loadItems() {
 
